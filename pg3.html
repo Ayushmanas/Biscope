@@ -1,0 +1,109 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Search by name</title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+        <script src="js/bootstrap.min.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-sm bg-dark">
+        
+            <!--Links-->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Search latest</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Person.html">Search by person</a>
+                </li>
+            </ul>
+        </nav>
+        <h1>Search by name</h1>
+        <nav class="navbar navbar-expand-sm form-group col-sm-5">
+            
+            <!--Links-->
+            <ul class="navbar-nav">
+                <li class="nav-item mr-4">
+                    <label>Enter your movie name</label>
+                </li>
+                <li class="nav-item">
+                    <input type="text" class="form-control" id="searchInput" />
+                </li>
+                <li class="nav-item">
+                    <button type="button" onclick="onSearch()" class="btn btn-primary ml-1">Search</button>
+                </li>
+            </ul>
+        </nav>
+        <!--
+        <div class="form-group col-sm-4">
+            <label>Enter your movie name</label>
+            <input type="text" class="form-control" id="searchInput" />
+            <button type="button" onclick="onSearch()" class="btn btn-primary mt-2">Search</button>
+        </div>
+        -->
+        <div>
+            <p class="text-center font-weight-bold" id="result"></p>
+        </div>
+        <div>
+            <ul id="list">
+            
+            </ul>
+        </div>
+        <script>
+            function onSearch(){
+                console.log('invoked on search');    
+                var inputEle=document.getElementById('searchInput');
+                var searchText = inputEle.value;
+                console.log('searchText '+searchText);
+                var pEle=document.getElementById('result');
+                
+                //for clearing display after every new result.
+                document.getElementById('list').innerHTML='';
+                
+                //ajax
+                
+                var ajax = new XMLHttpRequest();
+                ajax.onreadystatechange=function(){
+                    if(this.readyState==4&&this.status==200){
+                        var response= this.responseText;
+                        var jsonObj = JSON.parse(response);
+                        console.log(jsonObj);
+                       pEle.innerHTML='Search results for movie name '+searchText+', Total Result is :'+jsonObj.total_results;
+                        
+                        var movieArray=jsonObj.results;
+                        if(movieArray.length>0){
+                            
+                            for(var t=0;t<movieArray.length;t++){
+                                var movie=movieArray[t];
+                                console.log(movie.title);
+                                console.log(movie.release_date);
+                                console.log(movie.overview+'|');
+                                var liEle = document.createElement('li');
+                                liEle.innerHTML=`${movie.title}
+<br> ${movie.release_date}
+<br> ${movie.overview}`;
+                                liEle.setAttribute("class","list-group-item");
+                                document.getElementById('list').appendChild(liEle);
+                            }
+                        }
+                        
+                    }
+                }
+                //~ ` this (`) is said as :backtick 
+                var url=`https://api.themoviedb.org/3/search/movie?
+api_key=d094ee4cf55df244f10b5c2467af6ae6
+&language=en-US
+&query=${searchText}
+&page=1
+&include_adult=true`;
+                ajax.open('GET',url,true);
+                ajax.send();
+            }
+        </script>
+    </body>
+</html>
